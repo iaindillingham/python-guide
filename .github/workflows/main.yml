@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  check-for-clean-notebooks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Clean notebooks
+        run: |
+          docker run --volume $(pwd):/workspace ghcr.io/opensafely-core/python:latest jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace notebooks/*.ipynb
+
+      - name: Check for clean notebooks
+        run: |
+          git diff --name-only --exit-code
